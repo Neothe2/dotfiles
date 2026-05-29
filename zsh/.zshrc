@@ -117,4 +117,5 @@ export PATH="$HOME/development-tools/flutter/bin:$PATH"
 export ANDROID_HOME=$HOME/development-tools/android
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:/opt/nvim-linux-x86_64/bin
 # export CHROME_EXECUTABLE="$HOME/chrome-wsl-wrapper.sh"
