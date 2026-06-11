@@ -46,7 +46,7 @@ done 2>/dev/null &
 
 sudo apt update -y
 # Added build-essential here for gcc/make (required by nvim-treesitter)
-sudo apt install -y git stow zsh curl tar wget build-essential
+sudo apt install -y git stow zsh curl tar wget build-essential tmux
 
 info "Installing GitHub CLI (gh)..."
 (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
