@@ -33,7 +33,7 @@ EOF
 echo -e "${NC}"
 
 # --- 1. CORE SYSTEM PACKAGES & TOOLS ---
-info "Checking and installing core packages (Git, Stow, Zsh, Wget, Curl, Build-Essential)..."
+info "Checking and installing core packages (Git, Stow, Zsh, Wget, Curl, Build-Essential, pipx)..."
 # We ask for sudo upfront so it doesn't interrupt the flow later
 sudo -v
 
@@ -45,8 +45,8 @@ while true; do
 done 2>/dev/null &
 
 sudo apt update -y
-# Added build-essential here for gcc/make (required by nvim-treesitter)
-sudo apt install -y git stow zsh curl tar wget build-essential tmux
+# Added pipx and python3-venv here
+sudo apt install -y git stow zsh curl tar wget build-essential tmux pipx python3-venv
 
 info "Installing GitHub CLI (gh)..."
 (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
@@ -126,7 +126,15 @@ for app in nvim zsh tmux git; do
   success "Stowed: $app"
 done
 
-# --- 7. FINALIZE & SWITCH SHELL ---
+# --- 7. PYTHON CLI TOOLS (pipx) ---
+info "Setting up pipx and installing custom Python CLI tools..."
+# ensurepath adds ~/.local/bin to your bashrc/zshrc
+pipx ensurepath
+info "Installing N.U.T.S from GitHub..."
+pipx install "git+https://github.com/$GITHUB_USERNAME/nuts.git"
+success "N.U.T.S installed successfully!"
+
+# --- 8. FINALIZE & SWITCH SHELL ---
 # Check if current default shell is already zsh
 if [ "$SHELL" != "$(which zsh)" ]; then
   info "Changing default shell to Zsh..."

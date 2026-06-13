@@ -1,3 +1,25 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
+-- vim.keymap.set("n", "<leader>fah", function()
+--   local line = vim.api.nvim_get_current_line()
+--
+--   -- Clean up typical directory listing artifacts (like icons or leading spaces)
+--   -- Strip out file/folder icons and extra leading spaces
+--   local clean_name = line:gsub("^%s*[^%w%.%_%-]+%s*", ""):gsub("%s*$", "")
+--
+--   if clean_name == "" then
+--     vim.notify("No valid file name detected on this line", vim.log.levels.WARN)
+--     return
+--   end
+--
+--   -- Combine the active directory path with the filename under your cursor
+--   local current_dir = vim.fn.expand("%:p:h")
+--   local full_path = current_dir .. "/" .. clean_name
+--
+--   -- Copy the absolute path to both the system clipboard and selection registers
+--   vim.fn.setreg("+", full_path)
+--   vim.fn.setreg("*", full_path)
+--
+--   -- Use LazyVim's default notification pop-up UI
+--   vim.notify("Copied to clipboard: " .. full_path, vim.log.levels.INFO, {
+--     title = "File Explorer Path",
+--   })
+-- end, { desc = "Copy current file path to clipboard" })
