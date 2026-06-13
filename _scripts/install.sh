@@ -134,7 +134,24 @@ info "Installing N.U.T.S from GitHub..."
 pipx install "git+https://github.com/$GITHUB_USERNAME/nuts.git"
 success "N.U.T.S installed successfully!"
 
-# --- 8. FINALIZE & SWITCH SHELL ---
+# --- 8. CUSTOM SCRIPTS ---
+info "Setting up custom scripts (tm-dev)..."
+
+# Ensure the local bin directory exists
+mkdir -p "$HOME/.local/bin"
+
+# Make the tmux script executable
+if [ -f "$DOTFILES_DIR/tm-dev.sh" ]; then
+  chmod +x "$DOTFILES_DIR/tm-dev.sh"
+
+  # Force create a symlink to ~/.local/bin so it can be run from anywhere
+  ln -sf "$DOTFILES_DIR/tm-dev.sh" "$HOME/.local/bin/tm-dev"
+  success "tm-dev script linked successfully!"
+else
+  warn "tm-dev.sh not found in $DOTFILES_DIR. Skipping."
+fi
+
+# --- 9. FINALIZE & SWITCH SHELL ---
 # Check if current default shell is already zsh
 if [ "$SHELL" != "$(which zsh)" ]; then
   info "Changing default shell to Zsh..."
