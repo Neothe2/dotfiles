@@ -10,6 +10,8 @@ return {
     keys = {
       { "<leader>fl", "<cmd>FlutterLogToggle<cr>", desc = "Toggle Flutter Log (Bottom)" },
       { "<leader>fc", "<cmd>FlutterLogClear<cr>", desc = "Clear Flutter Log" },
+      { "<leader>fr", "<cmd>FlutterRun<cr>", desc = "Flutter: Run App" },
+      { "<leader>fq", "<cmd>FlutterQuit<cr>", desc = "Flutter: Quit App" },
     },
     opts = {
       ui = {
@@ -48,13 +50,31 @@ return {
         run_via_dap = true,
         register_configurations = function(paths)
           local dap = require("dap")
+
+          -- 1. The Flutter Debug Adapter Bridge
           dap.adapters.dart = {
             type = "executable",
             command = paths.flutter_bin,
-            args = { "debug-adapter" },
+            args = { "debug_adapter" }, -- Ensure this is an underscore
           }
-          require("dap.ext.vscode").load_launchjs()
+
+          -- 2. The Flutter DAP Configuration
+          dap.configurations.dart = {
+            {
+              type = "dart",
+              request = "launch",
+              name = "Launch Flutter App",
+              program = "${workspaceFolder}/lib/main.dart",
+              cwd = "${workspaceFolder}",
+
+              debugSdkLibraries = false,
+              debugExternalPackageLibraries = false,
+            },
+          }
         end,
+      },
+      dev_tools = {
+        autostart = false,
       },
     },
   },

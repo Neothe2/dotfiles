@@ -1,0 +1,19 @@
+return {
+  "mfussenegger/nvim-dap",
+  opts = function()
+    local dap = require("dap")
+
+    dap.configurations.dart = {
+      {
+        type = "dart",
+        request = "launch",
+        name = "Launch Flutter App",
+        program = "${workspaceFolder}/lib/main.dart",
+        cwd = "${workspaceFolder}",
+        -- CRITICAL: Tell the Dart VM to completely skip SDK and packages
+        debugSdk = false,
+        debugExternalPackageLibraries = false,
+      },
+    }
+  end,
+}
