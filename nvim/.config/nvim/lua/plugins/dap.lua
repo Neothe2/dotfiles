@@ -27,6 +27,48 @@ return {
       },
     }
 
+    -- The VS Code Emulator (Exception Interceptor)
+    -- This hooks into the raw DAP event stream
+    dap.listeners.after.event_stopped["flutter_exception_filter"] = function(session, body)
+      -- 1. Only trigger if the execution halted because of an exception
+      if body.reason == "exception" then
+        -- 2. Ask the adapter for the current stack trace to see WHERE it crashed
+        session:request("stackTrace", { threadId = body.threadId }, function(err, response)
+          if err then
+            return
+          end
+
+          if response and response.stackFrames and response.stackFrames[1] then
+            local frame = response.stackFrames[1]
+            local path = frame.source and (frame.source.path or frame.source.name) or ""
+
+            -- 3. THE FIREWALL LOGIC
+            -- If the crash is in the auto-generated web bootstrap or the Flutter SDK...
+            if
+              path:match("web_entrypoint.dart")
+              or path:match("flutter/bin/cache")
+              or path:match("flutter/packages")
+            then
+              -- 4. Silently force the thread to continue executing in the background
+              session:request("continue", { threadId = body.threadId })
+            end
+          end
+        end)
+      end
+    end
+    -- The Synthetic Step Forcer
+    -- Forces Neovim to yank the cursor back when Dart drops focus after skipping SDK code
+    dap.listeners.after.event_stopped["flutter_synthetic_step_fix"] = function(session, body)
+      if body.reason == "pause" then
+        session:request("stackTrace", { threadId = body.threadId }, function(err, response)
+          if err or not response or not response.stackFrames or #response.stackFrames == 0 then
+            return
+          end
+          -- Manually override the Neovim state machine to attach the cursor
+          session:set_current_frame(response.stackFrames[1])
+        end)
+      end
+    end
     -- 3. The Core Keymaps (The Controls)
     -- Map these locally here so you know exactly where your debug controls live.
     vim.keymap.set("n", "<F5>", dap.continue, { desc = "Debug: Start/Continue" })

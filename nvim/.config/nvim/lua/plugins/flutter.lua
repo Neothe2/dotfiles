@@ -55,18 +55,38 @@ return {
           dap.adapters.dart = {
             type = "executable",
             command = paths.flutter_bin,
-            args = { "debug_adapter" }, -- Ensure this is an underscore
+            args = { "debug_adapter" },
           }
 
           -- 2. The Flutter DAP Configuration
           dap.configurations.dart = {
+            -- TARGET 1: Native Mobile
             {
               type = "dart",
               request = "launch",
-              name = "Launch Flutter App",
+              name = "Launch Flutter App (Native)",
               program = "${workspaceFolder}/lib/main.dart",
               cwd = "${workspaceFolder}",
+              debugSdkLibraries = false,
+              debugExternalPackageLibraries = false,
+            },
+            -- TARGET 2: The Web Forcer
+            {
+              type = "dart",
+              request = "launch",
+              name = "Launch Flutter App (Web - Chrome)",
+              program = "${workspaceFolder}/lib/main.dart",
+              cwd = "${workspaceFolder}",
+              toolArgs = { "-d", "chrome" },
 
+              uriMappings = {
+                ["org-dartlang-app:///"] = "${workspaceFolder}/",
+                ["org-dartlang-app:/"] = "${workspaceFolder}/", -- Catches the single-slash DWDS bug
+                ["packages/"] = "${workspaceFolder}/.dart_tool/pub/bin/packages/", -- Catches external package steps
+              },
+
+              sendLogsToClient = true,
+              evaluateGettersInDebugViews = true,
               debugSdkLibraries = false,
               debugExternalPackageLibraries = false,
             },
