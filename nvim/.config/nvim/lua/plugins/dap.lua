@@ -56,17 +56,13 @@ return {
         end)
       end
     end
-    -- The Synthetic Step Forcer
-    -- Forces Neovim to yank the cursor back when Dart drops focus after skipping SDK code
-    dap.listeners.after.event_stopped["flutter_synthetic_step_fix"] = function(session, body)
+    -- The State Machine Interceptor (DWDS Web Fix)
+    -- This hooks into the event stream BEFORE Neovim DAP processes it.
+    dap.listeners.before.event_stopped["flutter_web_fix"] = function(session, body)
+      -- DWDS outputs 'pause' on synthetic steps. Neovim ignores 'pause' events for auto-focusing.
+      -- We forge the payload to say 'step' so Neovim natively grabs the cursor.
       if body.reason == "pause" then
-        session:request("stackTrace", { threadId = body.threadId }, function(err, response)
-          if err or not response or not response.stackFrames or #response.stackFrames == 0 then
-            return
-          end
-          -- Manually override the Neovim state machine to attach the cursor
-          session:set_current_frame(response.stackFrames[1])
-        end)
+        body.reason = "step"
       end
     end
     -- 3. The Core Keymaps (The Controls)
@@ -86,5 +82,21 @@ return {
     vim.keymap.set("n", "<leader>dO", dap.step_out, { desc = "Debug: Step Out" })
     vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "Debug: Terminate" })
     vim.keymap.set("n", "<leader>dr", dap.repl.toggle, { desc = "Debug: Toggle REPL" })
+
+    -- Exception Breakpoint Controls
+    vim.keymap.set("n", "<leader>dE", function()
+      require("dap").set_exception_breakpoints({ "All", "Unhandled" })
+      vim.notify("Exception Breakpoints: ALL", vim.log.levels.INFO)
+    end, { desc = "Debug: Break on ALL Exceptions" })
+
+    vim.keymap.set("n", "<leader>de", function()
+      require("dap").set_exception_breakpoints({ "Unhandled" })
+      vim.notify("Exception Breakpoints: UNHANDLED", vim.log.levels.INFO)
+    end, { desc = "Debug: Break on UNHANDLED Exceptions" })
+
+    vim.keymap.set("n", "<leader>dx", function()
+      require("dap").set_exception_breakpoints({})
+      vim.notify("Exception Breakpoints: CLEARED", vim.log.levels.INFO)
+    end, { desc = "Debug: Clear Exception Breakpoints" })
   end,
 }
