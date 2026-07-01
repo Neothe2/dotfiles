@@ -127,3 +127,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # Created by `pipx` on 2026-06-13 08:41:19
 export PATH="$PATH:/home/neo/.local/bin"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/neo/.local/bin:$PATH"
